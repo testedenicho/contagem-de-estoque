@@ -16,14 +16,7 @@ const client = new MongoClient(uri, {
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.static('public'));
-
-// Definir esquema do item
-const itemSchema = {
-  name: String,
-  quantity: Number,
-  description: String
-};
+app.use(express.static('public')); // Servir arquivos estáticos da pasta public
 
 let Item;
 
@@ -80,8 +73,9 @@ client.connect().then(() => {
     }
   });
 
-  app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
   });
 
 }).catch(console.dir);
