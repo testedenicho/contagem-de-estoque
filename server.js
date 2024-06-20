@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -27,6 +27,7 @@ client.connect().then(() => {
 
   // Rota para adicionar item
   app.post('/add-item', async (req, res) => {
+    console.log('Recebendo solicitação para adicionar item:', req.body);
     const newItem = {
       name: req.body.name,
       quantity: req.body.quantity,
@@ -34,9 +35,11 @@ client.connect().then(() => {
     };
 
     try {
-      await Item.insertOne(newItem);
+      const result = await Item.insertOne(newItem);
+      console.log('Item adicionado com sucesso:', result);
       res.send('Item adicionado com sucesso!');
     } catch (err) {
+      console.error('Erro ao adicionar item:', err);
       res.status(400).send(err);
     }
   });
@@ -55,7 +58,7 @@ client.connect().then(() => {
   app.put('/edit-item', async (req, res) => {
     const { id, quantity } = req.body;
     try {
-      await Item.updateOne({ _id: new MongoClient.ObjectID(id) }, { $set: { quantity: quantity } });
+      await Item.updateOne({ _id: new ObjectId(id) }, { $set: { quantity: quantity } });
       res.send('Item atualizado com sucesso!');
     } catch (err) {
       res.status(400).send(err);
@@ -66,7 +69,7 @@ client.connect().then(() => {
   app.delete('/delete-item', async (req, res) => {
     const { id } = req.body;
     try {
-      await Item.deleteOne({ _id: new MongoClient.ObjectID(id) });
+      await Item.deleteOne({ _id: new ObjectId(id) });
       res.send('Item deletado com sucesso!');
     } catch (err) {
       res.status(400).send(err);
