@@ -4,8 +4,15 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+console.log('Inicializando aplicação...');
+
 // Configurar MongoDB Atlas
 const uri = process.env.MONGODB_URI;
+if (!uri) {
+  console.error('MONGODB_URI não está definida');
+  process.exit(1);
+}
+console.log('URI do MongoDB:', uri);
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -20,10 +27,12 @@ app.use(express.static('public')); // Servir arquivos estáticos da pasta public
 
 let Item;
 
-// Conectar ao MongoDB e configurar modelo
+console.log('Conectando ao MongoDB...');
 client.connect().then(() => {
   const db = client.db("contagem_de_estoque");
   Item = db.collection('items');
+
+  console.log('Conectado ao MongoDB');
 
   // Rota para adicionar item
   app.post('/add-item', async (req, res) => {
@@ -81,4 +90,7 @@ client.connect().then(() => {
     console.log(`Servidor rodando na porta ${port}`);
   });
 
-}).catch(console.dir);
+}).catch(err => {
+  console.error('Erro ao conectar ao MongoDB:', err);
+  process.exit(1);
+});
